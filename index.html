@@ -3,301 +3,364 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>小酒馆角色管理</title>
+    <title>幻梦酒馆 Pro - 大容量版</title>
     <style>
-        /* 粉蓝色调设计 */
         :root {
             --pink: #FFD1DC;
             --blue: #BDE0FE;
             --dark-pink: #FF91AF;
             --dark-blue: #A2D2FF;
+            --bg: #fdfbff;
         }
 
         body {
             background: linear-gradient(135deg, var(--pink) 0%, var(--blue) 100%);
+            background-attachment: fixed;
             margin: 0; min-height: 100vh;
             font-family: "Microsoft YaHei", sans-serif;
             color: #5a5a5a;
         }
 
-        /* 顶部导航 */
         header {
-            background: rgba(255, 255, 255, 0.6);
-            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(15px);
             padding: 20px; text-align: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
             position: sticky; top: 0; z-index: 10;
         }
 
         .btn {
-            padding: 10px 20px; border: none; border-radius: 20px;
+            padding: 10px 22px; border: none; border-radius: 25px;
             cursor: pointer; font-weight: bold; margin: 5px;
-            transition: 0.3s;
+            transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
         .btn-add { background-color: var(--dark-pink); color: white; }
         .btn-rand { background-color: var(--dark-blue); color: white; }
-        .btn:hover { transform: scale(1.05); opacity: 0.9; }
+        .btn-back { background: white; color: #777; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.15); }
 
-        /* 角色卡片网格 */
-        .container { max-width: 1000px; margin: 20px auto; padding: 0 15px; }
+        .container { max-width: 900px; margin: 20px auto; padding: 0 15px; }
+        
+        /* 角色网格 */
         .char-grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 15px;
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 20px;
         }
 
         .char-card {
-            background: white; border-radius: 15px; padding: 15px;
+            background: rgba(255, 255, 255, 0.9); border-radius: 20px; padding: 20px;
             text-align: center; position: relative; cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            transition: 0.3s; border: 2px solid transparent;
         }
+        .char-card:hover { border-color: var(--dark-pink); transform: scale(1.03); }
 
         .char-avatar {
-            width: 90px; height: 90px; border-radius: 50%;
-            object-fit: cover; border: 3px solid var(--pink);
+            width: 100px; height: 100px; border-radius: 50%;
+            object-fit: cover; border: 4px solid white;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
 
-        .char-name { margin-top: 10px; font-weight: bold; font-size: 16px; }
+        .char-name { margin-top: 12px; font-weight: bold; font-size: 18px; color: #444; }
 
-        /* 记录页面 */
-        .detail-view { background: rgba(255,255,255,0.8); border-radius: 20px; padding: 20px; }
+        /* 详情页 */
+        .detail-card { 
+            background: rgba(255, 255, 255, 0.85); border-radius: 25px; 
+            padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
         .thought-item {
-            background: white; margin: 15px 0; padding: 15px;
-            border-radius: 12px; position: relative;
+            background: white; margin: 20px 0; padding: 20px;
+            border-radius: 15px; position: relative; border-left: 5px solid var(--dark-blue);
         }
-        .thought-img { max-width: 100%; border-radius: 8px; margin-top: 10px; display: block; }
-        
-        /* 弹窗 */
+        .thought-img { 
+            max-width: 100%; border-radius: 12px; margin-top: 15px; 
+            display: block; cursor: zoom-in;
+        }
+
+        /* 模态框 */
         .modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center;
+            background: rgba(0,0,0,0.4); display: none; align-items: center; justify-content: center;
+            z-index: 100; backdrop-filter: blur(5px);
         }
-        .modal-box { background: white; padding: 25px; border-radius: 20px; width: 300px; }
-        input[type="text"] { width: 100%; padding: 8px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; }
+        .modal-box { 
+            background: white; padding: 30px; border-radius: 25px; 
+            width: 85%; max-width: 350px; box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
 
-        .del-btn { color: #ff4d4f; border: none; background: none; cursor: pointer; font-size: 12px; }
+        input[type="text"], textarea {
+            width: 100%; padding: 12px; margin: 10px 0; 
+            border: 1px solid #eee; border-radius: 12px; background: #f9f9f9;
+            box-sizing: border-box;
+        }
+
+        .del-btn { color: #ff7875; border: none; background: #fff1f0; padding: 5px 10px; border-radius: 10px; cursor: pointer; font-size: 12px; margin-top: 10px;}
         .hidden { display: none; }
-        .highlight { border: 4px solid var(--dark-pink) !important; animation: shake 0.5s; }
-        @keyframes shake { 0%, 100% {transform: rotate(0);} 25% {transform: rotate(5deg);} 75% {transform: rotate(-5deg);} }
+        .highlight { border: 4px solid var(--dark-pink) !important; background: var(--pink) !important; }
+
+        @keyframes bounce { 0%, 100% {transform: scale(1);} 50% {transform: scale(1.05);} }
+        .animate-bounce { animation: bounce 0.4s infinite; }
     </style>
 </head>
 <body>
 
 <header>
-    <h2 style="margin:0 0 10px 0; color: #7a7a7a;">🌸 我的角色工坊</h2>
+    <h1 style="margin:0 0 10px 0; color: #555; font-size: 24px;">✨ 幻梦角色工坊</h1>
     <button class="btn btn-add" onclick="showModal()">+ 新建角色</button>
-    <button class="btn btn-rand" onclick="randomPick()">🎲 随机选一张</button>
+    <button class="btn btn-rand" onclick="randomPick()">🎲 帮我选一张</button>
 </header>
 
 <div class="container">
-    <!-- 主页 -->
     <div id="homeView">
         <div class="char-grid" id="charGrid"></div>
     </div>
 
-    <!-- 角色详情页 -->
     <div id="detailView" class="hidden">
-        <button class="btn" onclick="goHome()">返回列表</button>
-        <div class="detail-view">
+        <button class="btn btn-back" onclick="goHome()">← 返回角色列表</button>
+        <div class="detail-card">
             <div id="charHeader" style="text-align: center; margin-bottom: 20px;"></div>
-            <hr>
-            <h4>添加新想法/截图：</h4>
-            <textarea id="thoughtText" style="width:100%; height:60px; border-radius:8px; padding:10px; border:1px solid #ddd;" placeholder="写下此刻的想法..."></textarea>
-            <div style="margin: 10px 0;">
-                上传截图: <input type="file" id="thoughtFile" accept="image/*">
+            <div style="background: #f0f7ff; padding: 15px; border-radius: 15px;">
+                <h4 style="margin:0 0 10px 0;">📝 记录灵感/截图</h4>
+                <textarea id="thoughtText" placeholder="此时此刻想到了什么..."></textarea>
+                <div style="font-size: 14px; margin-bottom: 10px;">
+                    附带截图：<input type="file" id="thoughtFile" accept="image/*">
+                </div>
+                <button class="btn btn-add" id="saveThoughtBtn" onclick="addThought()">保存记录</button>
             </div>
-            <button class="btn btn-add" onclick="addThought()">保存记录</button>
             <div id="thoughtList"></div>
         </div>
     </div>
 </div>
 
-<!-- 新建角色弹窗 -->
 <div class="modal" id="modal">
     <div class="modal-box">
-        <h3>创建新角色</h3>
+        <h3 style="margin-top:0">新建角色卡</h3>
         <input type="text" id="newName" placeholder="角色名字">
-        <div style="font-size: 12px; color: #888;">上传头像:</div>
+        <p style="font-size: 12px; color: #999;">上传一张好看的头像：</p >
         <input type="file" id="newAvatar" accept="image/*">
-        <div style="margin-top: 20px; display: flex; justify-content: space-between;">
-            <button class="btn btn-add" onclick="createChar()">确定</button>
-            <button class="btn" onclick="hideModal()">取消</button>
+        <div style="margin-top: 25px; display: flex; gap: 10px;">
+            <button class="btn btn-add" style="flex:1" onclick="createChar()">确定</button>
+            <button class="btn" style="flex:1; background:#eee" onclick="hideModal()">取消</button>
         </div>
     </div>
 </div>
 
 <script>
-    // 数据存储结构
-    let characters = JSON.parse(localStorage.getItem('my_chars') || '[]');
+    /** IndexedDB 数据库管理 **/
+    let db;
+    const DB_NAME = "TavernDB";
+    const STORE_NAME = "Characters";
+
+    const initDB = () => {
+        return new Promise((resolve) => {
+            const request = indexedDB.open(DB_NAME, 1);
+            request.onupgradeneeded = (e) => {
+                db = e.target.result;
+                db.createObjectStore(STORE_NAME, { keyPath: "id" });
+            };
+            request.onsuccess = (e) => {
+                db = e.target.result;
+                resolve();
+            };
+        });
+    };
+
+    const getAllChars = () => {
+        return new Promise((resolve) => {
+            const transaction = db.transaction(STORE_NAME, "readonly");
+            const store = transaction.objectStore(STORE_NAME);
+            const request = store.getAll();
+            request.onsuccess = () => resolve(request.result || []);
+        });
+    };
+
+    const saveCharToDB = (char) => {
+        return new Promise((resolve) => {
+            const transaction = db.transaction(STORE_NAME, "readwrite");
+            const store = transaction.objectStore(STORE_NAME);
+            store.put(char);
+            transaction.oncomplete = () => resolve();
+        });
+    };
+
+    const deleteCharFromDB = (id) => {
+        return new Promise((resolve) => {
+            const transaction = db.transaction(STORE_NAME, "readwrite");
+            const store = transaction.objectStore(STORE_NAME);
+            store.delete(id);
+            transaction.oncomplete = () => resolve();
+        });
+    };
+
+    /** 业务逻辑 **/
     let activeCharId = null;
 
-    // 显示首页
-    function renderHome() {
+    async function refreshHome() {
+        const chars = await getAllChars();
         const grid = document.getElementById('charGrid');
-        grid.innerHTML = '';
-        characters.forEach(char => {
+        grid.innerHTML = chars.length ? '' : '<p style="text-align:center; color:#999; grid-column:1/-1; margin-top:50px;">酒馆空荡荡的，快去创建角色吧~</p >';
+        chars.forEach(char => {
             const div = document.createElement('div');
             div.className = 'char-card';
             div.id = 'card-' + char.id;
             div.onclick = () => showDetail(char.id);
             div.innerHTML = `
-                < img src="${char.avatar || 'https://via.placeholder.com/80'}" class="char-avatar">
+                < img src="${char.avatar || 'https://via.placeholder.com/100'}" class="char-avatar">
                 <div class="char-name">${char.name}</div>
-                <button class="del-btn" onclick="deleteChar(event, ${char.id})">删除</button>
+                <button class="del-btn" onclick="deleteChar(event, ${char.id})">删除角色</button>
             `;
             grid.appendChild(div);
         });
     }
 
-    // 新建角色相关
     function showModal() { document.getElementById('modal').style.display = 'flex'; }
     function hideModal() { document.getElementById('modal').style.display = 'none'; }
 
-    function createChar() {
+    async function createChar() {
         const name = document.getElementById('newName').value;
         const file = document.getElementById('newAvatar').files[0];
-        
-        if (!name) return alert('请输入名字');
+        if (!name) return alert('起个名字吧~');
 
+        let avatarData = "";
         if (file) {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = function() {
-                saveChar(name, reader.result);
-            };
-        } else {
-            saveChar(name, '');
+            avatarData = await toBase64(file);
         }
-    }
 
-    function saveChar(name, avatarData) {
         const newChar = {
             id: Date.now(),
             name: name,
             avatar: avatarData,
             thoughts: []
         };
-        try {
-            characters.push(newChar);
-            localStorage.setItem('my_chars', JSON.stringify(characters));
-            renderHome();
-            hideModal();
-            document.getElementById('newName').value = '';
-            document.getElementById('newAvatar').value = '';
-        } catch(e) {
-            alert('存储空间已满，请删除一些旧照片后再试！');
-        }
+
+        await saveCharToDB(newChar);
+        hideModal();
+        document.getElementById('newName').value = '';
+        document.getElementById('newAvatar').value = '';
+        refreshHome();
     }
 
-    function deleteChar(e, id) {
+    async function deleteChar(e, id) {
         e.stopPropagation();
-        if (confirm('确定删除角色吗？')) {
-            characters = characters.filter(c => c.id !== id);
-            localStorage.setItem('my_chars', JSON.stringify(characters));
-            renderHome();
+        if (confirm('真的要让这位角色离开酒馆吗？')) {
+            await deleteCharFromDB(id);
+            refreshHome();
         }
     }
 
-    // 详情页相关
-    function showDetail(id) {
+    async function showDetail(id) {
         activeCharId = id;
-        const char = characters.find(c => c.id === id);
+        const chars = await getAllChars();
+        const char = chars.find(c => c.id === id);
+        
         document.getElementById('homeView').classList.add('hidden');
         document.getElementById('detailView').classList.remove('hidden');
-        
         document.getElementById('charHeader').innerHTML = `
-            < img src="${char.avatar}" style="width:100px; height:100px; border-radius:50%; object-fit:cover;">
-            <h2>${char.name}</h2>
+            < img src="${char.avatar}" style="width:120px; height:120px; border-radius:50%; object-fit:cover; border:5px solid white; box-shadow:0 5px 15px rgba(0,0,0,0.1);">
+            <h2 style="margin:10px 0;">${char.name}</h2>
         `;
-        renderThoughts();
+        renderThoughts(char.thoughts);
+        window.scrollTo(0,0);
     }
 
     function goHome() {
         document.getElementById('homeView').classList.remove('hidden');
         document.getElementById('detailView').classList.add('hidden');
+        refreshHome();
     }
 
-    function addThought() {
+    async function addThought() {
         const text = document.getElementById('thoughtText').value;
         const file = document.getElementById('thoughtFile').files[0];
-        const char = characters.find(c => c.id === activeCharId);
-
         if (!text && !file) return;
 
-        if (file) {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = function() {
-                pushThought(char, text, reader.result);
-            };
-        } else {
-            pushThought(char, text, '');
-        }
-    }
+        const btn = document.getElementById('saveThoughtBtn');
+        btn.innerText = "保存中...";
+        btn.disabled = true;
 
-    function pushThought(char, text, imgData) {
+        let imgData = "";
+        if (file) imgData = await toBase64(file);
+
+        const chars = await getAllChars();
+        const char = chars.find(c => c.id === activeCharId);
+        
         char.thoughts.unshift({
             tid: Date.now(),
             content: text,
             img: imgData,
             date: new Date().toLocaleString()
         });
-        try {
-            localStorage.setItem('my_chars', JSON.stringify(characters));
-            renderThoughts();
-            document.getElementById('thoughtText').value = '';
-            document.getElementById('thoughtFile').value = '';
-        } catch(e) {
-            alert('照片太大存不下啦，请尝试截取更小的图片！');
-        }
+
+        await saveCharToDB(char);
+        
+        btn.innerText = "保存记录";
+        btn.disabled = false;
+        document.getElementById('thoughtText').value = '';
+        document.getElementById('thoughtFile').value = '';
+        renderThoughts(char.thoughts);
     }
 
-    function renderThoughts() {
-        const char = characters.find(c => c.id === activeCharId);
+    function renderThoughts(thoughts) {
         const list = document.getElementById('thoughtList');
-        list.innerHTML = '';
-        char.thoughts.forEach(t => {
+        list.innerHTML = thoughts.length ? '' : '<p style="text-align:center; color:#999; padding:30px;">还没有记录任何灵感...</p >';
+        thoughts.forEach(t => {
             const item = document.createElement('div');
             item.className = 'thought-item';
             item.innerHTML = `
-                <div style="font-size:12px; color:#999;">${t.date}</div>
-                <div style="margin:10px 0;">${t.content}</div>
-                ${t.img ? `< img src="${t.img}" class="thought-img">` : ''}
-                <button class="del-btn" onclick="deleteThought(${t.tid})">删除记录</button>
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                    <span style="font-size:12px; color:#bbb;">${t.date}</span>
+                    <button class="del-btn" style="margin:0" onclick="deleteThought(${t.tid})">删除</button>
+                </div>
+                <div style="margin:10px 0; line-height:1.6; white-space:pre-wrap;">${t.content}</div>
+                ${t.img ? `< img src="${t.img}" class="thought-img" onclick="window.open('${t.img}')">` : ''}
             `;
             list.appendChild(item);
         });
     }
 
-    function deleteThought(tid) {
-        const char = characters.find(c => c.id === activeCharId);
+    async function deleteThought(tid) {
+        if (!confirm('删除这条记录？')) return;
+        const chars = await getAllChars();
+        const char = chars.find(c => c.id === activeCharId);
         char.thoughts = char.thoughts.filter(t => t.tid !== tid);
-        localStorage.setItem('my_chars', JSON.stringify(characters));
-        renderThoughts();
+        await saveCharToDB(char);
+        renderThoughts(char.thoughts);
     }
 
-    // 随机抽卡
-    function randomPick() {
-        if (characters.length === 0) return alert('请先新建角色！');
+    async function randomPick() {
+        const chars = await getAllChars();
+        if (chars.length < 1) return alert('酒馆里还没有人哦！');
+        
         const cards = document.querySelectorAll('.char-card');
         let count = 0;
-        const interval = setInterval(() => {
-            cards.forEach(c => c.classList.remove('highlight'));
-            const randIdx = Math.floor(Math.random() * cards.length);
-            cards[randIdx].classList.add('highlight');
+        const timer = setInterval(() => {
+            cards.forEach(c => c.classList.remove('highlight', 'animate-bounce'));
+            const rand = Math.floor(Math.random() * cards.length);
+            cards[rand].classList.add('highlight', 'animate-bounce');
             count++;
-            if (count > 10) {
-                clearInterval(interval);
-                const winner = characters[randIdx];
+            if (count > 12) {
+                clearInterval(timer);
                 setTimeout(() => {
-                    alert('今天就玩：' + winner.name);
-                    showDetail(winner.id);
-                }, 200);
+                    const finalChar = chars.find(c => 'card-'+c.id === cards[rand].id);
+                    alert('✨ 命运的指引：今天玩 ' + finalChar.name + '！');
+                    showDetail(finalChar.id);
+                }, 300);
             }
-        }, 100);
+        }, 80);
     }
 
-    // 初始化显示
-    renderHome();
+    function toBase64(file) {
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+        });
+    }
+
+    // 初始化
+    window.onload = async () => {
+        await initDB();
+        refreshHome();
+    };
 </script>
 
 </body>
