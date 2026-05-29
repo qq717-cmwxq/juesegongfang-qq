@@ -304,19 +304,32 @@
         tx.oncomplete = () => renderHome();
     }
 
+    // 修复后的随机选择函数
     function randomPick() {
         const cards = document.querySelectorAll('.char-card');
         if(cards.length < 1) return alert("酒馆里还没人");
+        
+        // 先清除所有已有的闪烁效果
+        cards.forEach(c => c.classList.remove('pick-anim'));
+        
         let i = 0;
+        let selectedIndex = 0;
         const timer = setInterval(() => {
+            // 每次循环先清除所有闪烁
             cards.forEach(c => c.classList.remove('pick-anim'));
+            
             const r = Math.floor(Math.random() * cards.length);
+            selectedIndex = r;
             cards[r].classList.add('pick-anim');
+            
             if(i++ > 10) {
                 clearInterval(timer);
+                // 动画结束后，清除闪烁并自动跳转
                 setTimeout(() => {
+                    cards.forEach(c => c.classList.remove('pick-anim'));
                     alert("✨ 命运选择了这位角色！");
-                    cards[r].click();
+                    // 自动点击选中的卡片
+                    cards[selectedIndex].click();
                 }, 300);
             }
         }, 100);
