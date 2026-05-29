@@ -3,99 +3,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>幻梦酒馆 - 最终专业版</title>
+    <title>幻梦酒馆 - 纯净版</title>
     <style>
         :root {
             --pink: #FFD1DC; --blue: #BDE0FE;
             --dark-pink: #FF91AF; --dark-blue: #A2D2FF;
         }
+
         body {
             background: linear-gradient(135deg, var(--pink) 0%, var(--blue) 100%);
-            background-attachment: fixed; margin: 0; font-family: "PingFang SC", "Microsoft YaHei", sans-serif; color: #444;
+            background-attachment: fixed; margin: 0; font-family: "Microsoft YaHei", sans-serif; color: #555;
         }
+
+        /* 顶部导航 */
         header {
-            background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px);
-            padding: 15px; text-align: center; box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px);
+            padding: 15px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             position: sticky; top: 0; z-index: 100;
         }
+
         .btn {
-            padding: 10px 22px; border: none; border-radius: 25px; cursor: pointer;
-            font-weight: bold; transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 10px 20px; border: none; border-radius: 20px; cursor: pointer;
+            font-weight: bold; margin: 5px; transition: 0.3s;
         }
-        .btn-main { background: var(--dark-pink); color: white; margin: 5px; }
-        .btn-sub { background: var(--dark-blue); color: white; margin: 5px; }
-        .btn:hover { transform: scale(1.05); filter: brightness(1.1); }
+        .btn-main { background: var(--dark-pink); color: white; }
+        .btn-sub { background: var(--dark-blue); color: white; }
+        .btn:hover { transform: scale(1.05); }
 
         .container { max-width: 800px; margin: 20px auto; padding: 0 15px; }
 
-        /* 卡片设计 */
-        .char-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
+        /* 角色卡片 */
+        .char-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px;
+        }
         .char-card {
-            background: white; border-radius: 20px; padding: 15px; text-align: center;
-            cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.05); position: relative; border: 2px solid transparent;
+            background: white; border-radius: 15px; padding: 15px; text-align: center;
+            cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.05); position: relative;
         }
-        .char-card:hover { border-color: var(--dark-pink); }
-        .char-avatar { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 3px solid var(--pink); background: #eee; }
-        .char-name { margin-top: 10px; font-weight: bold; display: block; }
+        .char-avatar { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid var(--pink); }
+        .char-name { margin-top: 10px; font-weight: bold; display: block; overflow: hidden; text-overflow: ellipsis; }
 
-        /* 详情页 */
-        .detail-view { background: rgba(255,255,255,0.9); border-radius: 25px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        /* 详情记录页 */
+        .detail-view { background: rgba(255,255,255,0.9); border-radius: 20px; padding: 20px; min-height: 400px; }
         .thought-card {
-            background: white; margin-top: 20px; padding: 20px; border-radius: 15px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05); border-left: 6px solid var(--dark-blue);
+            background: white; margin-top: 15px; padding: 15px; border-radius: 12px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-left: 4px solid var(--dark-pink);
         }
-        .display-img { max-width: 100%; border-radius: 12px; margin-top: 15px; display: block; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        
+        .display-img { max-width: 100%; border-radius: 8px; margin-top: 10px; display: block; border: 1px solid #eee; }
+        .time-tag { font-size: 12px; color: #bbb; display: block; margin-bottom: 5px; }
+
         /* 弹窗 */
         .modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.4); display: none; align-items: center; justify-content: center; z-index: 200; backdrop-filter: blur(5px);
+            background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 200;
         }
-        .modal-content { background: white; padding: 30px; border-radius: 25px; width: 320px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+        .modal-content { background: white; padding: 25px; border-radius: 20px; width: 300px; }
         
         .hidden { display: none !important; }
-        input[type="text"], textarea { width: 100%; box-sizing: border-box; padding: 12px; margin: 10px 0; border: 1px solid #eee; border-radius: 12px; background: #f9f9f9; }
-        .del-btn { color: #ff7875; cursor: pointer; font-size: 13px; margin-top: 15px; display: inline-block; background: #fff1f0; padding: 4px 10px; border-radius: 8px; }
-
-        .pick-anim { animation: jump 0.3s infinite alternate; border: 3px solid var(--dark-pink) !important; background: var(--pink) !important; }
-        @keyframes jump { from {transform: translateY(0);} to {transform: translateY(-10px);} }
+        input[type="text"], textarea { width: 100%; box-sizing: border-box; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; }
+        .del-text { color: #ff4d4f; cursor: pointer; font-size: 12px; text-decoration: underline; margin-top: 10px; display: inline-block; }
+        
+        /* 抽卡动画 */
+        .pick-anim { animation: flash 0.2s infinite; border: 4px solid var(--dark-pink) !important; }
+        @keyframes flash { from {opacity: 1;} to {opacity: 0.5;} }
     </style>
 </head>
 <body>
 
 <header>
-    <h1 style="margin:0 0 10px 0; font-size: 22px; color: #555;">✨ 幻梦酒馆管理</h1>
+    <h2 style="margin:0; color:#666;">🌸 幻梦酒馆管理</h2>
     <button class="btn btn-main" onclick="openModal()">+ 新建角色</button>
     <button class="btn btn-sub" onclick="randomPick()">🎲 随机选一张</button>
 </header>
 
 <div class="container">
+    <!-- 首页列表 -->
     <div id="homeView" class="char-grid"></div>
 
+    <!-- 详情页面 -->
     <div id="detailView" class="hidden">
-        <button class="btn" onclick="goBack()" style="background:#fff; margin-bottom:15px;">← 返回列表</button>
+        <button class="btn" onclick="goBack()" style="background:#eee;">← 返回列表</button>
         <div class="detail-view">
             <div id="detailHeader" style="text-align: center;"></div>
-            <div style="background: #edf6ff; padding: 20px; border-radius: 20px; margin: 20px 0;">
-                <h4 style="margin:0 0 10px 0;">新建想法 & 截图</h4>
-                <textarea id="inpText" rows="3" placeholder="在这里写下你的感想..."></textarea>
-                <div style="margin: 10px 0;">
-                    选择图片: <input type="file" id="inpFile" accept="image/*">
+            <div style="background:#f9f9f9; padding:15px; border-radius:15px; margin:20px 0;">
+                <h4 style="margin:0 0 10px 0;">记录新感想</h4>
+                <textarea id="inpText" placeholder="说点什么..."></textarea>
+                上传图片: <input type="file" id="inpFile" accept="image/*" onchange="previewImage(this)">
+                <div id="previewContainer" style="margin-top:10px; display:none;">
+                    <img id="previewImg" style="max-width:100%; max-height:200px; border-radius:8px;">
+                    <button onclick="clearImage()" style="background:#ff4d4f; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; margin-top:5px;">移除</button>
                 </div>
-                <button class="btn btn-main" style="width:100%;" onclick="saveThought()">保存记录</button>
+                <button class="btn btn-main" style="width:100%; margin-top:10px;" onclick="saveThought()">保存到记录本</button>
             </div>
             <div id="thoughtList"></div>
         </div>
     </div>
 </div>
 
+<!-- 新建弹窗 -->
 <div id="modal" class="modal">
     <div class="modal-content">
-        <h3 style="margin-top:0">新增角色</h3>
-        <input type="text" id="newName" placeholder="角色名字">
-        <div style="font-size: 13px; margin: 10px 0 5px 0;">上传头像:</div>
-        <input type="file" id="newAvatar" accept="image/*">
-        <div style="margin-top:25px; display:flex; gap:10px;">
+        <h3>新增角色</h3>
+        <input type="text" id="newName" placeholder="角色名字...">
+        上传头像: <input type="file" id="newAvatar" accept="image/*" onchange="previewAvatar(this)">
+        <div id="avatarPreviewContainer" style="margin-top:10px; display:none;">
+            <img id="avatarPreviewImg" style="max-width:100%; max-height:200px; border-radius:8px;">
+        </div>
+        <div style="margin-top:20px; display:flex; gap:10px;">
             <button class="btn btn-main" style="flex:1" onclick="addChar()">确定</button>
             <button class="btn" style="flex:1; background:#eee" onclick="closeModal()">取消</button>
         </div>
@@ -103,34 +117,30 @@
 </div>
 
 <script>
-    /** 核心存储：直接存二进制文件 (Blob) 而不是代码 **/
+    /** 数据库核心逻辑 (IndexedDB) **/
     let db;
-    const dbReq = indexedDB.open("TavernBinaryDB", 2);
-    dbReq.onupgradeneeded = e => {
-        db = e.target.result;
-        if (!db.objectStoreNames.contains("chars")) {
-            db.createObjectStore("chars", { keyPath: "id" });
-        }
-    };
-    dbReq.onsuccess = e => { db = e.target.result; renderHome(); };
+    const request = indexedDB.open("TavernData", 1);
+    request.onupgradeneeded = e => e.target.result.createObjectStore("chars", { keyPath: "id" });
+    request.onsuccess = e => { db = e.target.result; renderHome(); };
 
+    // 辅助函数：将图片文件转为DataURL
+    const fileToData = file => new Promise(res => {
+        const r = new FileReader();
+        r.onload = e => res(e.target.result);
+        r.readAsDataURL(file);
+    });
+
+    /** 页面功能 **/
     let curId = null;
-    let objectUrls = []; // 用于管理图片链接，防止内存溢出
+    let currentImageData = null; // 存储当前上传的图片数据
 
-    // 清理旧的图片链接
-    function clearOldUrls() {
-        objectUrls.forEach(url => URL.revokeObjectURL(url));
-        objectUrls = [];
-    }
-
-    /** 功能逻辑 **/
     async function addChar() {
         const name = document.getElementById('newName').value;
         const file = document.getElementById('newAvatar').files[0];
-        if(!name) return alert("名字不能为空哦");
+        if(!name) return alert("请填写名字");
 
-        // 直接存文件对象 file，不转 base64
-        const newChar = { id: Date.now(), name, avatarFile: file, thoughts: [] };
+        const avatar = file ? await fileToData(file) : "";
+        const newChar = { id: Date.now(), name, avatar, thoughts: [] };
 
         const tx = db.transaction("chars", "readwrite");
         tx.objectStore("chars").add(newChar);
@@ -139,14 +149,13 @@
             renderHome();
             document.getElementById('newName').value = "";
             document.getElementById('newAvatar').value = "";
+            document.getElementById('avatarPreviewContainer').style.display = 'none';
         };
     }
 
     async function renderHome() {
         const home = document.getElementById('homeView');
         home.innerHTML = "";
-        clearOldUrls();
-
         const tx = db.transaction("chars", "readonly");
         tx.objectStore("chars").openCursor().onsuccess = e => {
             const cursor = e.target.result;
@@ -156,18 +165,10 @@
                 div.className = 'char-card';
                 div.id = 'card-' + char.id;
                 div.onclick = () => showDetail(char.id);
-                
-                // 将文件转为临时链接
-                let imgUrl = "https://via.placeholder.com/90";
-                if (char.avatarFile) {
-                    imgUrl = URL.createObjectURL(char.avatarFile);
-                    objectUrls.push(imgUrl);
-                }
-
                 div.innerHTML = `
-                    < img src="${imgUrl}" class="char-avatar">
+                    <img src="${char.avatar || 'https://via.placeholder.com/80'}" class="char-avatar" alt="${char.name}">
                     <span class="char-name">${char.name}</span>
-                    <span class="del-btn" onclick="deleteChar(event, ${char.id})">删除角色</span>
+                    <span class="del-text" onclick="deleteChar(event, ${char.id})">删除</span>
                 `;
                 home.appendChild(div);
                 cursor.continue();
@@ -182,40 +183,81 @@
             const char = e.target.result;
             document.getElementById('homeView').classList.add('hidden');
             document.getElementById('detailView').classList.remove('hidden');
-            
-            let imgUrl = "https://via.placeholder.com/100";
-            if (char.avatarFile) {
-                imgUrl = URL.createObjectURL(char.avatarFile);
-                objectUrls.push(imgUrl);
-            }
-
             document.getElementById('detailHeader').innerHTML = `
-                < img src="${imgUrl}" class="char-avatar" style="width:110px; height:110px; border:5px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
-                <h2 style="margin:10px 0;">${char.name}</h2>
+                <img src="${char.avatar || 'https://via.placeholder.com/80'}" class="char-avatar" style="width:100px; height:100px;" alt="${char.name}">
+                <h2>${char.name}</h2>
             `;
             renderThoughts(char.thoughts);
         };
     }
 
+    // 预览上传的图片（新建角色时）
+    function previewAvatar(input) {
+        const container = document.getElementById('avatarPreviewContainer');
+        const img = document.getElementById('avatarPreviewImg');
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                img.src = e.target.result;
+                container.style.display = 'block';
+            };
+            reader.readAsDataURL(input.files[0]);
+        } else {
+            container.style.display = 'none';
+        }
+    }
+
+    // 预览上传的图片（保存感想时）
+    function previewImage(input) {
+        const container = document.getElementById('previewContainer');
+        const img = document.getElementById('previewImg');
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                img.src = e.target.result;
+                container.style.display = 'block';
+                currentImageData = e.target.result; // 保存图片数据
+            };
+            reader.readAsDataURL(input.files[0]);
+        } else {
+            container.style.display = 'none';
+            currentImageData = null;
+        }
+    }
+
+    // 移除已上传的图片
+    function clearImage() {
+        document.getElementById('inpFile').value = '';
+        document.getElementById('previewContainer').style.display = 'none';
+        document.getElementById('previewImg').src = '';
+        currentImageData = null;
+    }
+
     async function saveThought() {
         const text = document.getElementById('inpText').value;
-        const file = document.getElementById('inpFile').files[0];
-        if(!text && !file) return;
+        // 使用保存的图片数据，而不是重新读取文件
+        const imgData = currentImageData || "";
+        
+        if(!text && !imgData) return;
 
         const tx = db.transaction("chars", "readwrite");
         const store = tx.objectStore("chars");
+        
         store.get(curId).onsuccess = e => {
             const char = e.target.result;
             char.thoughts.unshift({
                 tid: Date.now(),
                 text: text,
-                imgFile: file, // 直接存文件
+                img: imgData,
                 time: new Date().toLocaleString()
             });
             store.put(char);
             tx.oncomplete = () => {
                 document.getElementById('inpText').value = "";
                 document.getElementById('inpFile').value = "";
+                document.getElementById('previewContainer').style.display = 'none';
+                document.getElementById('previewImg').src = '';
+                currentImageData = null;
                 renderThoughts(char.thoughts);
             };
         };
@@ -223,31 +265,27 @@
 
     function renderThoughts(thoughts) {
         const list = document.getElementById('thoughtList');
-        list.innerHTML = thoughts.length ? "" : "<p style='text-align:center;color:#999;margin-top:40px;'>还没有记录感想...</p >";
-        
+        list.innerHTML = thoughts.length ? "" : "<p style='text-align:center;color:#ccc;'>暂无记录</p>";
         thoughts.forEach(t => {
             const div = document.createElement('div');
             div.className = 'thought-card';
-            
-            let imgHtml = "";
-            if (t.imgFile) {
-                const url = URL.createObjectURL(t.imgFile);
-                objectUrls.push(url);
-                imgHtml = `< img src="${url}" class="display-img" onclick="window.open('${url}')">`;
+            // 修复：确保图片标签格式正确
+            let imgHtml = '';
+            if (t.img && t.img.length > 0) {
+                imgHtml = `<img src="${t.img}" class="display-img" alt="上传图片">`;
             }
-
             div.innerHTML = `
-                <small style="color:#bbb;">${t.time}</small>
-                <div style="margin:10px 0; white-space:pre-wrap; line-height:1.6;">${t.text}</div>
+                <small class="time-tag">${t.time}</small>
+                <div style="white-space:pre-wrap; word-break:break-all;">${t.text}</div>
                 ${imgHtml}
-                <span class="del-btn" onclick="delThought(${t.tid})">删除本条</span>
+                <span class="del-text" onclick="delThought(${t.tid})">删除记录</span>
             `;
             list.appendChild(div);
         });
     }
 
     function delThought(tid) {
-        if(!confirm("确定删除？")) return;
+        if(!confirm("确定删除这条记录？")) return;
         const tx = db.transaction("chars", "readwrite");
         const store = tx.objectStore("chars");
         store.get(curId).onsuccess = e => {
@@ -260,7 +298,7 @@
 
     function deleteChar(e, id) {
         e.stopPropagation();
-        if(!confirm("将永久删除该角色和所有照片，确定吗？")) return;
+        if(!confirm("彻底删除该角色及其所有记录？")) return;
         const tx = db.transaction("chars", "readwrite");
         tx.objectStore("chars").delete(id);
         tx.oncomplete = () => renderHome();
@@ -268,7 +306,7 @@
 
     function randomPick() {
         const cards = document.querySelectorAll('.char-card');
-        if(cards.length < 1) return alert("酒馆还没人呢");
+        if(cards.length < 1) return alert("酒馆里还没人");
         let i = 0;
         const timer = setInterval(() => {
             cards.forEach(c => c.classList.remove('pick-anim'));
@@ -277,16 +315,16 @@
             if(i++ > 10) {
                 clearInterval(timer);
                 setTimeout(() => {
-                    alert("✨ 抽中了：" + cards[r].querySelector('.char-name').innerText);
+                    alert("✨ 命运选择了这位角色！");
                     cards[r].click();
-                }, 400);
+                }, 300);
             }
         }, 100);
     }
 
     function openModal() { document.getElementById('modal').style.display='flex'; }
     function closeModal() { document.getElementById('modal').style.display='none'; }
-    function goBack() { renderHome(); document.getElementById('homeView').classList.remove('hidden'); document.getElementById('detailView').classList.add('hidden'); }
+    function goBack() { document.getElementById('homeView').classList.remove('hidden'); document.getElementById('detailView').classList.add('hidden'); }
 </script>
 
 </body>
